@@ -12,6 +12,7 @@ export default function Product({ product }: { product: TProduct }) {
       window.dataLayer?.push(product);
     }
   }, [product]);
+  console.log("product", product);
   return (
     <Link href={`/products/${product.id}`} className="block">
       <div className="border rounded-lg p-4 h-full flex flex-col">
