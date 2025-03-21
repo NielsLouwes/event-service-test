@@ -8,12 +8,18 @@ declare global {
 
 type EventItemType = Pick<TProduct, "title" | "category" | "price"> & {
   eventType: string;
+  location: string;
+};
+
+type PageViewType = {
+  eventType: string;
+  location: string;
 };
 
 export class DataLayer {
   private eventQueue: EventItemType[] = [];
 
-  push(product: TProduct) {
+  addProduct(product: TProduct) {
     const eventItem: EventItemType = {
       eventType: "offer_open",
       title: product.title,
@@ -22,6 +28,15 @@ export class DataLayer {
     };
 
     this.eventQueue.push(eventItem as EventItemType);
+  }
+
+  pageView(path: string) {
+    const eventItem: PageViewType = {
+      eventType: "page_view",
+      location: path,
+    };
+
+    this.eventQueue.push(eventItem);
   }
 
   reset() {

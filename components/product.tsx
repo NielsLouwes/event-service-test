@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Product({ product }: { product: TProduct }) {
   const handleClick = () => {
-    dataLayer.push(product);
+    dataLayer.addProduct(product);
   };
 
   return (
