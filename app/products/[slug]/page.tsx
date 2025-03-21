@@ -1,7 +1,7 @@
 import React from "react";
 
 const ProductDetailPage = async ({ params }: { params: { slug: string } }) => {
-  const { slug } = params;
+  const { slug } = await params;
   const productId = parseInt(slug);
 
   const data = await fetch(`https://fakestoreapi.com/products/${productId}`);

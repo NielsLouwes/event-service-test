@@ -6,14 +6,22 @@ declare global {
   }
 }
 
-export class DataLayer {
-  // fields
-  private eventQueue: TProduct[] = [];
+type EventItemType = Pick<TProduct, "title" | "category" | "price"> & {
+  eventType: string;
+};
 
-  // methods
+export class DataLayer {
+  private eventQueue: EventItemType[] = [];
+
   push(product: TProduct) {
-    this.eventQueue.push(product);
-    console.log("DataLayer Event Pushed:", product);
+    const eventItem: EventItemType = {
+      eventType: "offer_open",
+      title: product.title,
+      category: product.category,
+      price: product.price,
+    };
+
+    this.eventQueue.push(eventItem as EventItemType);
   }
 
   reset() {
@@ -23,5 +31,6 @@ export class DataLayer {
 
 export const dataLayer: DataLayer =
   typeof window !== "undefined"
-    ? ((window as any).dataLayer = (window as any).dataLayer || new DataLayer())
+    ? ((window as Window).dataLayer =
+        (window as Window).dataLayer || new DataLayer())
     : new DataLayer();
