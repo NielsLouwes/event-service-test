@@ -6,28 +6,29 @@ declare global {
   }
 }
 
-type EventItemType = Pick<TProduct, "title" | "category" | "price"> & {
+type ProductEventType = Pick<TProduct, "title" | "category" | "price"> & {
   eventType: string;
-  location: string;
 };
 
 type PageViewType = {
   eventType: string;
-  location: string;
+  location?: string;
 };
 
+type DataLayerEventType = ProductEventType | PageViewType;
+
 export class DataLayer {
-  private eventQueue: EventItemType[] = [];
+  private eventQueue: DataLayerEventType[] = [];
 
   addProduct(product: TProduct) {
-    const eventItem: EventItemType = {
+    const eventItem: ProductEventType = {
       eventType: "offer_open",
       title: product.title,
       category: product.category,
       price: product.price,
     };
 
-    this.eventQueue.push(eventItem as EventItemType);
+    this.eventQueue.push(eventItem as ProductEventType);
   }
 
   pageView(path: string) {
