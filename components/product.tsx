@@ -1,20 +1,20 @@
 "use client";
 
+import { dataLayer } from "@/helpers/datalayer";
 import { TProduct } from "./products-handler";
 import Link from "next/link";
-import { useEffect } from "react";
 
 export default function Product({ product }: { product: TProduct }) {
-  useEffect(() => {
-    if (!product) return;
+  const handleClick = () => {
+    dataLayer.push(product);
+  };
 
-    if (typeof window !== "undefined") {
-      window.dataLayer?.push(product);
-    }
-  }, [product]);
-  console.log("product", product);
   return (
-    <Link href={`/products/${product.id}`} className="block">
+    <Link
+      href={`/products/${product.id}`}
+      className="block"
+      onClick={handleClick}
+    >
       <div className="border rounded-lg p-4 h-full flex flex-col">
         <div className="h-48 relative mb-4">
           <img

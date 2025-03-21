@@ -1,8 +1,14 @@
 import { TProduct } from "@/components/products-handler";
 
+declare global {
+  interface Window {
+    dataLayer: DataLayer;
+  }
+}
+
 export class DataLayer {
   // fields
-  eventQueue: TProduct[] = [];
+  private eventQueue: TProduct[] = [];
 
   // methods
   push(product: TProduct) {
