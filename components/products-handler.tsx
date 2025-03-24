@@ -16,14 +16,36 @@ export type TProduct = {
   };
 };
 
+const fetchProducts = async () => {
+  try {
+    const response = await fetch(api);
+    if (!response.ok) throw new Error("failed to fetch products");
+    return response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export default async function ProductsHandler() {
-  const data = await fetch(api);
-  const products: TProduct[] = await data.json();
-  // console.log("products", products);
+  const products: TProduct[] = await fetchProducts();
+
+  const newProducts = () => {
+    const newP = products.map((product) => {
+      const item = {
+        ...product,
+        popular: product.rating.rate > 4.5,
+      };
+      return item;
+    });
+
+    return newP;
+  };
+
+  const finalProducts = newProducts();
 
   return (
     <>
-      <Products products={products} />
+      <Products products={finalProducts} />
     </>
   );
 }

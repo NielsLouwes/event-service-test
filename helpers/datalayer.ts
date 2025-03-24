@@ -12,7 +12,7 @@ type ProductEventType = Pick<TProduct, "title" | "category" | "price"> & {
 
 type PageViewType = {
   eventType: string;
-  location?: string;
+  location: string;
 };
 
 type DataLayerEventType = ProductEventType | PageViewType;
