@@ -1,12 +1,12 @@
 "use client";
 
-import { dataLayer } from "@/helpers/datalayer";
+import { events } from "@/helpers/events";
 import { TProduct } from "./products-handler";
 import Link from "next/link";
 
 export default function Product({ product }: { product: TProduct }) {
   const handleClick = () => {
-    dataLayer.addProduct(product);
+    events.addProduct(product);
   };
 
   return (

@@ -1,13 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { dataLayer } from "./datalayer";
+import { events } from "./events";
 
 const PageViewTracker = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    dataLayer.pageView(pathname);
+    events.pageView(pathname);
   }, [pathname]);
 
   return null;

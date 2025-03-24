@@ -2,11 +2,14 @@ import { TProduct } from "@/components/products-handler";
 
 declare global {
   interface Window {
-    dataLayer: DataLayer;
+    events: Events;
   }
 }
 
-type ProductEventType = Pick<TProduct, "title" | "category" | "price"> & {
+type ProductEventType = Pick<
+  TProduct,
+  "title" | "category" | "price" | "id"
+> & {
   eventType: string;
 };
 
@@ -17,12 +20,13 @@ type PageViewType = {
 
 type DataLayerEventType = ProductEventType | PageViewType;
 
-export class DataLayer {
+export class Events {
   private eventQueue: DataLayerEventType[] = [];
 
   addProduct(product: TProduct) {
     const eventItem: ProductEventType = {
       eventType: "offer_open",
+      id: product.id,
       title: product.title,
       category: product.category,
       price: product.price,
@@ -45,8 +49,7 @@ export class DataLayer {
   }
 }
 
-export const dataLayer: DataLayer =
+export const events: Events =
   typeof window !== "undefined"
-    ? ((window as Window).dataLayer =
-        (window as Window).dataLayer || new DataLayer())
-    : new DataLayer();
+    ? ((window as Window).events = (window as Window).events || new Events())
+    : new Events();

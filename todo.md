@@ -8,3 +8,4 @@
 left off: added popular tag, now can use that to first render those, then render the rest. Use that to create a slideshow.
 
 5. Put API URL in secret (.env)
+6. Create AI models for clothes (https://lalaland.ai/)
