@@ -1,4 +1,5 @@
 import { TProduct } from "@/components/products-handler";
+import { eventBufferService } from "./event-buffer-service";
 
 declare global {
   interface Window {
@@ -18,10 +19,18 @@ type PageViewType = {
   location: string;
 };
 
-type DataLayerEventType = ProductEventType | PageViewType;
+export type DataLayerEventType = ProductEventType | PageViewType;
 
 export class Events {
+  // Check of limit of 5 has been reached every time an item is added to eventQueue
+  // We don't need to call the eventBufferService until 5 is reached? Or else we call it every single time a new product or pageview event happens
   private eventQueue: DataLayerEventType[] = [];
+
+  private checkQueueAndProcess() {
+    if (this.eventQueue.length > 4) {
+      eventBufferService(this.eventQueue.slice(0, 5)); // send copy of arr, 5 items to buffer service
+    }
+  }
 
   addProduct(product: TProduct) {
     const eventItem: ProductEventType = {

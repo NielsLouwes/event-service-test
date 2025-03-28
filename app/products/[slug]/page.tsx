@@ -6,6 +6,7 @@ const ProductDetailPage = async ({ params }: { params: { slug: string } }) => {
 
   const data = await fetch(`https://fakestoreapi.com/products/${productId}`);
   const product = await data.json();
+  console.log("product", product);
 
   return (
     <div className="p-8">
