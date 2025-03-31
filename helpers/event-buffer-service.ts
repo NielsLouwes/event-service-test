@@ -1,14 +1,14 @@
 import { DataLayerEventType } from "./events";
 
-export const eventBufferService = (queue: DataLayerEventType[]) => {
-  // it will accept events from eventQueue
-  // think about failed batches of events
-  // what happens to new events after 5 are reached?
+const eventQueue: DataLayerEventType[] = [];
+const queueLength = 5;
 
-  // when 5 events are reached , we send event batch to BE
-  const queueLength = 5;
+export const eventBufferService = (event: DataLayerEventType) => {
+  eventQueue.push(event);
+  console.log("new event pushed!");
+  console.log("eventQueue", eventQueue);
 
-  if (queue.length === queueLength) {
+  if (eventQueue.length == queueLength) {
     // send eventBatch to BE
     // const eventBatch = queue.slice(0, queueLength);
     console.log(`Queuelength of ${queueLength} reached, sending to BE`);
@@ -20,7 +20,7 @@ export const eventBufferService = (queue: DataLayerEventType[]) => {
   //     console.log("data successfully sent to BE");
   //     // remove items from queue
   //   }
-
+  console.log("");
   //   if (!res) {
   //     console.log("data FAILED to send to BE");
   //   }
