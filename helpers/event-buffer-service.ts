@@ -23,6 +23,7 @@ export const eventBufferService = async (event: DataLayerEventType) => {
         },
         body: JSON.stringify(eventQueue),
       });
+      console.log("response", response);
 
       const result = await response.json();
       console.log("Event sent sucesfully", result);
