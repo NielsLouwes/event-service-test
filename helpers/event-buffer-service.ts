@@ -1,6 +1,7 @@
 import { DataLayerEventType } from "./events";
 
 const eventQueue: DataLayerEventType[] = [];
+const failedEventQueue = [];
 const queueLength = 5;
 
 // we are sending all events over, not slicing it and storing the remainder in buffer to keep collection events.
@@ -13,9 +14,9 @@ export const eventBufferService = async (event: DataLayerEventType) => {
   if (eventQueue.length == queueLength) {
     // send eventBatch to BE
     // const eventBatch = queue.slice(0, queueLength);
+    let eventBatch = eventQueue.slice(0, queueLength);
+    console.log("eventBatch", eventBatch, eventBatch.length);
     console.log(`Queuelength of ${queueLength} reached, sending to BE`);
-    const test = JSON.stringify(eventQueue);
-    console.log("test", test);
 
     try {
       const response = await fetch("http://localhost:3001/events", {
@@ -23,9 +24,21 @@ export const eventBufferService = async (event: DataLayerEventType) => {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(eventQueue),
+        body: JSON.stringify(eventBatch),
       });
       console.log("response", response);
+
+      // if failed to send events, push to new arr and empty batch arr
+      if (!response.ok) {
+        failedEventQueue.push(...eventBatch);
+        eventBatch = [];
+      }
+
+      // if success, that means events were sent, we can empty batch and wait for new queue to reach 5 length
+
+      if (response.status === 200) {
+        eventBatch = [];
+      }
 
       const result = await response.json();
       console.log("Event sent sucesfully", result);
