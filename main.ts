@@ -5,7 +5,7 @@ import { DataLayerEventType } from "./types/types.ts";
 
 // GOAL: Store events, send back failure or success so FE event buffer service can process
 const app = express();
-const port = 8000;
+const port = 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -19,15 +19,14 @@ app.get("/", (_req, res) => {
 app.post("/events", (_req, res) => {
   try {
     // Log the incoming event for debugging
-    console.log("Received event:", _req.body);
-    console.log("response", res);
 
-    events.push(_req.body);
+    events.push(..._req.body);
 
     res.status(200).json({
       message: "Events received successfully",
       eventCount: events.length,
     });
+    console.log("events", events);
   } catch (error) {
     console.error("Error processing event:", error);
 
