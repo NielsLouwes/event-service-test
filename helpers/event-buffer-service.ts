@@ -14,9 +14,11 @@ export const eventBufferService = async (event: DataLayerEventType) => {
     // send eventBatch to BE
     // const eventBatch = queue.slice(0, queueLength);
     console.log(`Queuelength of ${queueLength} reached, sending to BE`);
+    const test = JSON.stringify(eventQueue);
+    console.log("test", test);
 
     try {
-      const response = await fetch("/events", {
+      const response = await fetch("http://localhost:3001/events", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
