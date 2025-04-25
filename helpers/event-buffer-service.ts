@@ -14,7 +14,14 @@ export const eventBufferService = async (event: DataLayerEventType) => {
   if (eventQueue.length == queueLength) {
     // send eventBatch to BE
 
-    let eventBatch = eventQueue.slice(0, queueLength); // making a copy of the queue of size 5
+    let eventBatch = eventQueue.slice(0, queueLength); // making a copy of the queue of size 5\
+
+    // TODO: Update BE with eventBatch structure
+
+    // const eventBatch = {
+    //   events: eventQueue.slice(0, queueLength),
+    //   batchTimestamp: Date.now(),
+    // };
     console.log("eventBatch", eventBatch, eventBatch.length);
     console.log(`Queuelength of ${queueLength} reached, sending to BE`);
 

@@ -21,8 +21,8 @@ left off: added popular tag, now can use that to first render those, then render
 
 ## LEFT OFF
 
-1. 404 error when sending events to BE - send 5 events and look into ths issue
-2. need timestamp from FE on each event, but also on the event itself? - check that timestampw worked
+1. 404 error when sending events to BE - send 5 events and look into ths issue - DONE
+2. need timestamp from FE on each event, but also on the event itself? - check that timestamp worked
 3. Do we create a new type for BE? date.now for the batch?
    {events: [eventsQueue.slice(0m5), timestamp: date.now()]}
-4. Created batching and failed event logic, need to remove batched events from eventQueue
+4. Created batching and failed event logic, need to remove batched events from eventQueue - DONE
