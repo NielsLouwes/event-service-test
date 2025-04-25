@@ -29,7 +29,7 @@ const fetchProducts = async () => {
 export default async function ProductsHandler() {
   const products: TProduct[] = await fetchProducts();
 
-  const newProducts = () => {
+  const ratedProducts = () => {
     const newP = products.map((product) => {
       const item = {
         ...product,
@@ -41,7 +41,7 @@ export default async function ProductsHandler() {
     return newP;
   };
 
-  const finalProducts = newProducts();
+  const finalProducts = ratedProducts();
 
   return (
     <>

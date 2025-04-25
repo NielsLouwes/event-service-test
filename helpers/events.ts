@@ -24,9 +24,6 @@ type PageViewType = {
 export type DataLayerEventType = ProductEventType | PageViewType;
 
 export class Events {
-  // Check of limit of 5 has been reached every time an item is added to eventQueue
-  // We don't need to call the eventBufferService until 5 is reached? Or else we call it every single time a new product or pageview event happens
-
   addProduct(product: TProduct) {
     const eventItem: ProductEventType = {
       eventType: "offer_open",

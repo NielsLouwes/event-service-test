@@ -13,8 +13,8 @@ export const eventBufferService = async (event: DataLayerEventType) => {
 
   if (eventQueue.length == queueLength) {
     // send eventBatch to BE
-    // const eventBatch = queue.slice(0, queueLength);
-    let eventBatch = eventQueue.slice(0, queueLength);
+
+    let eventBatch = eventQueue.slice(0, queueLength); // making a copy of the queue of size 5
     console.log("eventBatch", eventBatch, eventBatch.length);
     console.log(`Queuelength of ${queueLength} reached, sending to BE`);
 
@@ -31,13 +31,18 @@ export const eventBufferService = async (event: DataLayerEventType) => {
       // if failed to send events, push to new arr and empty batch arr
       if (!response.ok) {
         failedEventQueue.push(...eventBatch);
+        eventQueue.splice(0, queueLength);
         eventBatch = [];
       }
 
       // if success, that means events were sent, we can empty batch and wait for new queue to reach 5 length
 
-      if (response.status === 200) {
+      if (response.ok) {
+        console.log("events sent successfully - clearing eventBatch");
+        eventQueue.splice(0, queueLength);
         eventBatch = [];
+        console.log("new event batch", eventBatch);
+        console.log("updated EventQueue - 5", eventQueue);
       }
 
       const result = await response.json();
