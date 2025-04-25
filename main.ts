@@ -1,7 +1,7 @@
 // @deno-types="npm:@types/express@4"
 import express, { NextFunction, Request, Response } from "express";
 import cors from "npm:cors";
-import { DataLayerEventType } from "./types/types.ts";
+import { DataLayerEventType, EventBatch } from "./types/types.ts";
 
 // GOAL: Store events, send back failure or success so FE event buffer service can process
 const app = express();

@@ -24,3 +24,8 @@ type PageViewType = {
 };
 
 export type DataLayerEventType = ProductEventType | PageViewType;
+
+export interface EventBatch {
+  events: DataLayerEventType[];
+  batchTimestamp: number;
+}
