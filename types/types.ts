@@ -1,7 +1,7 @@
 export type TProduct = {
   category: string;
   description: string;
-  id: number;
+  id: string;
   image: string;
   price: number;
   title: string;
@@ -15,12 +15,14 @@ type ProductEventType = Pick<
   TProduct,
   "title" | "category" | "price" | "id"
 > & {
-  eventType: string;
+  eventType: 'page_view | offer_open';
 };
 
 type PageViewType = {
-  eventType: string;
+  eventType: 'page_view';
   location: string;
+  timeStamp: number;
+  id: string
 };
 
 export type DataLayerEventType = ProductEventType | PageViewType;
