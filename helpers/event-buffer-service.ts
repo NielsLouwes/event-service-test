@@ -2,8 +2,7 @@ import { DataLayerEventType } from "./events";
 
 let eventQueue: DataLayerEventType[] = [];
 const queueLength = 5;
-const MAX_RETRIES = 3;
-const INITIAL_RETRY_DELAY = 200;
+const MAX_RETRIES: number = 3;
 
 const sendEventBatch = async () => {
   const response = await fetch("http://localhost:3002/events", {
@@ -37,13 +36,22 @@ export const eventBufferService = async (event: DataLayerEventType) => {
       // if failed to send events, push to new arr and empty batch arr
       if (!response.ok) {
         console.warn("Issue sending events, trying again")
-        setTimeout(sendEventBatch, 200)
+
+        const retryEvents = (attempts: number) => {
+          if (attempts === 0){
+                return
+          }
+
+          setTimeout(sendEventBatch, 200)
+          console.log(`try number ${attempts}`)
+          retryEvents(attempts - 1)
+        }
+        retryEvents(MAX_RETRIES)
       }
+     
 
       // exponential backoff ) 2,4,8,16ms increasing in time
       // if success, that means events were sent, we can empty batch and wait for new queue to reach 5 length
-
-      // dont need this
      
         console.log("events sent successfully - clearing eventBatch");
         eventQueue.splice(0, queueLength);
