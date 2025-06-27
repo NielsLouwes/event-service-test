@@ -3,6 +3,7 @@ import { DataLayerEventType } from "./events";
 let eventQueue: DataLayerEventType[] = [];
 const queueLength = 5;
 const MAX_RETRIES: number = 3;
+let RETRY_DELAY = 200
 
 const sendEventBatch = async () => {
   const response = await fetch("http://localhost:3002/events", {
@@ -41,8 +42,9 @@ export const eventBufferService = async (event: DataLayerEventType) => {
           if (attempts === 0){
                 return
           }
-
-          setTimeout(sendEventBatch, 200)
+          
+          setTimeout(sendEventBatch, RETRY_DELAY)
+          RETRY_DELAY = RETRY_DELAY + 200
           console.log(`try number ${attempts}`)
           retryEvents(attempts - 1)
         }
