@@ -6,7 +6,7 @@ const api = "https://fakestoreapi.com/products";
 export type TProduct = {
   category: string;
   description: string;
-  id: number;
+  id: string;
   image: string;
   price: number;
   title: string;

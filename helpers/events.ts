@@ -1,5 +1,6 @@
 import { TProduct } from "@/components/products-handler";
 import { eventBufferService } from "./event-buffer-service";
+import {v4 as uuidv4} from 'uuid';
 
 declare global {
   interface Window {
@@ -19,16 +20,18 @@ type PageViewType = {
   eventType: string;
   location: string;
   timeStamp: number;
+  id: string
 };
 
 export type DataLayerEventType = ProductEventType | PageViewType;
 
+const eventId = uuidv4();
 export class Events {
   addProduct(product: TProduct) {
     const eventItem: ProductEventType = {
       eventType: "offer_open",
       timeStamp: Date.now(),
-      id: product.id,
+      id: `offer-open-${eventId}`,
       title: product.title,
       category: product.category,
       price: product.price,
@@ -42,6 +45,7 @@ export class Events {
       eventType: "page_view",
       timeStamp: Date.now(),
       location: path,
+      id: `page-view-${eventId}`,
     };
 
     eventBufferService(eventItem);
