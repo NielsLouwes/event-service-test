@@ -12,12 +12,12 @@ type ProductEventType = Pick<
   TProduct,
   "title" | "category" | "price" | "id"
 > & {
-  eventType: string;
+  eventType: 'offer_open';
   timeStamp: number;
 };
 
 type PageViewType = {
-  eventType: string;
+  eventType: 'page_view';
   location: string;
   timeStamp: number;
   id: string
