@@ -6,6 +6,7 @@ const MAX_RETRIES: number = 3;
 let RETRY_DELAY = 200
 
 const sendEventBatch = async () => {
+  console.log("Sending event batch:", eventQueue);
   const response = await fetch("http://localhost:3002/events", {
     method: "POST",
     headers: {

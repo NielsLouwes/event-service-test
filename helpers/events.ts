@@ -10,28 +10,31 @@ declare global {
 
 type ProductEventType = Pick<
   TProduct,
-  "title" | "category" | "price" | "id"
+  "title" | "category" | "price"
 > & {
   eventType: 'offer_open';
   timeStamp: number;
+  eventId: string
+  productId: string
 };
 
 type PageViewType = {
   eventType: 'page_view';
   location: string;
   timeStamp: number;
-  id: string
+  eventId: string
 };
 
 export type DataLayerEventType = ProductEventType | PageViewType;
 
-const eventId = uuidv4();
 export class Events {
   addProduct(product: TProduct) {
+    const eventId = uuidv4();
     const eventItem: ProductEventType = {
       eventType: "offer_open",
       timeStamp: Date.now(),
-      id: `offer-open-${eventId}`,
+      productId: product.id,
+      eventId: eventId,
       title: product.title,
       category: product.category,
       price: product.price,
@@ -41,11 +44,12 @@ export class Events {
   }
 
   pageView(path: string) {
+    const eventId = uuidv4();
     const eventItem: PageViewType = {
       eventType: "page_view",
       timeStamp: Date.now(),
       location: path,
-      id: `page-view-${eventId}`,
+      eventId: eventId,
     };
 
     eventBufferService(eventItem);
