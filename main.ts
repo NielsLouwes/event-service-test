@@ -1,6 +1,6 @@
 // @deno-types="npm:@types/express@4"
 import express, { NextFunction, Request, Response } from "express";
-import cors from "npm:cors";
+import cors from "cors";
 import { DataLayerEventType } from "./types/types.ts";
 import * as z from "zod/v4";
 
@@ -13,19 +13,19 @@ app.use(express.json());
 
 // ZOD schema validation
 const offerOpenSchema = z.object({
-  ['eventType']: z.string(),
-  ['timeStamp']: z.number(),
-  ['id']: z.string(),
-  ['title']: z.string(),
-  ['category']: z.string(),
-  ['price']: z.number(),
+  eventType: z.literal('offer_open'),
+  timeStamp: z.number(),
+  id: z.string(),
+  title: z.string(),
+  category: z.string(),
+  price: z.number(),
 })
 
 const pageViewSchema = z.object({
-  ['eventType']: z.string(),
-  ['timeStamp']: z.number(),
-  ['location']: z.string(),
-  ['id']: z.string(),
+  eventType: z.literal('page_view'),
+  timeStamp: z.number(),
+  location: z.string(),
+  id: z.string(),
 })
 
 type OfferOpenEvent = z.infer<typeof offerOpenSchema>;
@@ -33,6 +33,7 @@ type PageViewEvent = z.infer<typeof pageViewSchema>;
 
 // Next: implement POSTGRES for database
 const events: DataLayerEventType[] = [];
+console.log('events', events)
 
 app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
@@ -47,16 +48,24 @@ app.post("/events", (_req, res) => {
    _req.body.map((event) => {
       console.log('event***', event)
       if (event.eventType === 'offer-open'){
-        const result = offerOpenSchema.parse(event);
+        const result = offerOpenSchema.safeParse(event);
+        console.log('OFFER OPEN ^^^ result', result)
         if (result.success){
           events.push(result.data);
+        } else {
+          console.warn(`Event ${event} failed`)
+          failedEvents.push(result.data)
         }
       } 
       
       if (event.eventType === 'page-view'){
-        const result = pageViewSchema.parse(event);
+        const result = pageViewSchema.safeParse(event);
+        console.log('PAGE-VIEW OPEN *** result', result)
         if (result.success){
-          failedEvents.push(result.data);
+          events.push(result.data);
+        } else {
+          console.warn(`Event ${event} failed`)
+          failedEvents.push(result.data)
         }
       }
     })

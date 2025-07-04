@@ -15,7 +15,7 @@ type ProductEventType = Pick<
   TProduct,
   "title" | "category" | "price" | "id"
 > & {
-  eventType: 'page_view | offer_open';
+  eventType: 'offer_open';
 };
 
 type PageViewType = {
