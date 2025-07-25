@@ -38,8 +38,6 @@ type AcceptedEventTypes = {
 // Next: implement POSTGRES for database
 const events: DataLayerEventType[] = [];
 const failedEvents: any[] = []
-console.log('events', events)
-console.log('failedEvents', failedEvents)
 
 // const failedEventAnalysisService = () => {
 //   failedEvents.map((event) => {
@@ -53,12 +51,16 @@ app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
 });
 
-// LEFT OFF: need to fix ZOD to work correctly with failed and successfull events - type issue on success for some reason
+// LEFT OFF: Add validtion on request body, not empty and data type, move logic into own files (services)
 app.post("/events", (_req, res) => {
   try {
     console.log('_req.body', _req.body)
+
+    
+    const totalEvents = _req.body.length // size of incoming events
+    let successfulEventCount = 0;
+    let failedCount = 0;
    
-  
    _req.body.forEach((event: AcceptedEventTypes ) => {
     // First we check specifically for event types that we accept - offer_open, page_view, returning an error if they don't pass validation, otherwise sending to event list.
    // Second - we also pick up unknown event types, those are sent to failedEvents, to be analyzed and fixed? 
@@ -70,9 +72,11 @@ app.post("/events", (_req, res) => {
         console.log('OFFER OPEN ^^^ result', result)
         if (result.success){
           events.push(result.data);
+          successfulEventCount++
         } else {
           console.warn(`Offer open event failed validation:`, result.error);
           failedEvents.push(event);
+          failedCount++
         }
       } 
       
@@ -81,32 +85,48 @@ app.post("/events", (_req, res) => {
         console.log('PAGE-VIEW OPEN *** result', result)
         if (result.success) {
           events.push(result.data);
+          successfulEventCount++
         } else {
           console.warn(`Page view event failed validation:`, result.error);
           failedEvents.push(event);
+          failedCount++
         }
       }
 
       else {
         console.warn(`Unknown event type: ${event.eventType}`);
         failedEvents.push(event);
+        failedCount++
         console.log('failedEvents', failedEvents)
       }
     });
-    
-    
-    // events.push(..._req.body);
-    // add validation with ZOD, schema validation, check exact error number (4xx)
+ 
+    // below we handle status codes based on partial success, failure, and success
+    let statusCode = 200;
+    let message = "OK";
 
-    res.status(200).json({
-      message: "OK",
-    });
+    if (failedCount === totalEvents) {
+      statusCode = 400
+      message = "All events failed validation"
+    } else if (failedCount > 0) {
+      statusCode = 207
+      message = "Partial success, some events failed"
+    }
+    
+   res.status(statusCode).json({
+    message: message,
+    summary: {
+      total: totalEvents,
+      successful: successfulEventCount,
+      failed: failedCount
+    }
+   })
     console.log("events", events);
   } catch (error) {
     console.error("Error processing event:", error);
 
     res.status(500).json({
-      error: "Failed to process event",
+      error: "Server error",
     });
   }
 });
