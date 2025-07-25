@@ -15,24 +15,29 @@ app.use(express.json());
 const offerOpenSchema = z.object({
   eventType: z.literal('offer_open'),
   timeStamp: z.number(),
-  id: z.string(),
+  id: z.number(),
   title: z.string(),
   category: z.string(),
   price: z.number(),
 })
 
 const pageViewSchema = z.object({
+  eventId: z.string(),
   eventType: z.literal('page_view'),
   timeStamp: z.number(),
   location: z.string(),
-  id: z.string(),
+ 
 })
 
 type OfferOpenEvent = z.infer<typeof offerOpenSchema>;
 type PageViewEvent = z.infer<typeof pageViewSchema>;
+type AcceptedEventTypes = {
+  eventType: 'offer_open' | 'page_view'
+} 
 
 // Next: implement POSTGRES for database
 const events: DataLayerEventType[] = [];
+const failedEvents: DataLayerEventType[] = []
 console.log('events', events)
 
 app.get("/", (_req, res) => {
@@ -43,35 +48,35 @@ app.get("/", (_req, res) => {
 app.post("/events", (_req, res) => {
   try {
     console.log('_req.body', _req.body)
-    const failedEvents: DataLayerEventType[] = []
+   
   
-   _req.body.map((event) => {
+   _req.body.map((event: AcceptedEventTypes ) => {
       console.log('event***', event)
-      if (event.eventType === 'offer-open'){
+      if (event.eventType === 'offer_open'){
         const result = offerOpenSchema.safeParse(event);
         console.log('OFFER OPEN ^^^ result', result)
         if (result.success){
           events.push(result.data);
         } else {
-          console.warn(`Event ${event} failed`)
+          console.warn(`Event ${event.eventType} failed`)
           failedEvents.push(result.data)
         }
       } 
       
-      if (event.eventType === 'page-view'){
+      if (event.eventType === 'page_view'){
         const result = pageViewSchema.safeParse(event);
         console.log('PAGE-VIEW OPEN *** result', result)
         if (result.success){
           events.push(result.data);
         } else {
-          console.warn(`Event ${event} failed`)
+          console.warn(`Event ${event.eventType} failed`)
           failedEvents.push(result.data)
         }
       }
     })
     
     
-    events.push(..._req.body);
+    // events.push(..._req.body);
     // add validation with ZOD, schema validation, check exact error number (4xx)
 
     res.status(200).json({

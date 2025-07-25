@@ -22,7 +22,7 @@ type PageViewType = {
   eventType: 'page_view';
   location: string;
   timeStamp: number;
-  id: string
+  id: number
 };
 
 export type DataLayerEventType = ProductEventType | PageViewType;
