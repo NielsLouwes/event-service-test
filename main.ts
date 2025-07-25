@@ -15,7 +15,7 @@ app.use(express.json());
 const offerOpenSchema = z.object({
   eventType: z.literal('offer_open'),
   timeStamp: z.number(),
-  id: z.number(),
+  productId: z.number(),
   title: z.string(),
   category: z.string(),
   price: z.number(),
@@ -37,8 +37,17 @@ type AcceptedEventTypes = {
 
 // Next: implement POSTGRES for database
 const events: DataLayerEventType[] = [];
-const failedEvents: DataLayerEventType[] = []
+const failedEvents: any[] = []
 console.log('events', events)
+console.log('failedEvents', failedEvents)
+
+// const failedEventAnalysisService = () => {
+//   failedEvents.map((event) => {
+//     return {
+//       event.
+//     }
+//   })
+// }
 
 app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
@@ -50,30 +59,40 @@ app.post("/events", (_req, res) => {
     console.log('_req.body', _req.body)
    
   
-   _req.body.map((event: AcceptedEventTypes ) => {
+   _req.body.forEach((event: AcceptedEventTypes ) => {
+    // First we check specifically for event types that we accept - offer_open, page_view, returning an error if they don't pass validation, otherwise sending to event list.
+   // Second - we also pick up unknown event types, those are sent to failedEvents, to be analyzed and fixed? 
+
       console.log('event***', event)
-      if (event.eventType === 'offer_open'){
+     
+      if (event.eventType === 'offer_open') {
         const result = offerOpenSchema.safeParse(event);
         console.log('OFFER OPEN ^^^ result', result)
         if (result.success){
           events.push(result.data);
         } else {
-          console.warn(`Event ${event.eventType} failed`)
-          failedEvents.push(result.data)
+          console.warn(`Offer open event failed validation:`, result.error);
+          failedEvents.push(event);
         }
       } 
       
-      if (event.eventType === 'page_view'){
+      else if (event.eventType === 'page_view') {
         const result = pageViewSchema.safeParse(event);
         console.log('PAGE-VIEW OPEN *** result', result)
-        if (result.success){
+        if (result.success) {
           events.push(result.data);
         } else {
-          console.warn(`Event ${event.eventType} failed`)
-          failedEvents.push(result.data)
+          console.warn(`Page view event failed validation:`, result.error);
+          failedEvents.push(event);
         }
       }
-    })
+
+      else {
+        console.warn(`Unknown event type: ${event.eventType}`);
+        failedEvents.push(event);
+        console.log('failedEvents', failedEvents)
+      }
+    });
     
     
     // events.push(..._req.body);
