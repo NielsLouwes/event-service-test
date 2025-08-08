@@ -1,67 +1,52 @@
 // @deno-types="npm:@types/express@4"
 import express, { NextFunction, Request, Response } from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import { DataLayerEventType } from "./types/types.ts";
-import * as z from "zod/v4";
+import { AcceptedEventTypes } from "./src/types/types.ts";
+import { offerOpenSchema, pageViewSchema } from "./src/validators/zod-schema.ts";
+import { failedEvents } from "./src/services/failed-events.ts";
+import { validationMiddleWare } from "./src/middleware/validation.ts";
 
 // GOAL: Store events, send back failure or success so FE event buffer service can process
 const app = express();
 const port = 3002;
 
-app.use(cors());
+const allowedOrigins = ["http://localhost:3000"]; 
+
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser tools
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["POST", "OPTIONS", "GET"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// Handle preflight requests
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
-// ZOD schema validation
-const offerOpenSchema = z.object({
-  eventType: z.literal('offer_open'),
-  timeStamp: z.number(),
-  productId: z.number(),
-  title: z.string(),
-  category: z.string(),
-  price: z.number(),
-})
-
-const pageViewSchema = z.object({
-  eventId: z.string(),
-  eventType: z.literal('page_view'),
-  timeStamp: z.number(),
-  location: z.string(),
- 
-})
-
-type OfferOpenEvent = z.infer<typeof offerOpenSchema>;
-type PageViewEvent = z.infer<typeof pageViewSchema>;
-type AcceptedEventTypes = {
-  eventType: 'offer_open' | 'page_view'
-} 
 
 // Next: implement POSTGRES for database
 const events: DataLayerEventType[] = [];
-const failedEvents: any[] = []
-
-// const failedEventAnalysisService = () => {
-//   failedEvents.map((event) => {
-//     return {
-//       event.
-//     }
-//   })
-// }
-
 app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
 });
 
-// LEFT OFF: Add validtion on request body, not empty and data type, move logic into own files (services)
 app.post("/events", (_req, res) => {
   try {
     console.log('_req.body', _req.body)
-
-    
-    const totalEvents = _req.body.length // size of incoming events
+    const totalEvents = _req.body.length 
     let successfulEventCount = 0;
     let failedCount = 0;
+    validationMiddleWare(_req.body, res);
    
-   _req.body.forEach((event: AcceptedEventTypes ) => {
+   _req.body.forEach((event: AcceptedEventTypes) => {
     // First we check specifically for event types that we accept - offer_open, page_view, returning an error if they don't pass validation, otherwise sending to event list.
    // Second - we also pick up unknown event types, those are sent to failedEvents, to be analyzed and fixed? 
 
@@ -134,3 +119,6 @@ app.post("/events", (_req, res) => {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+
+
