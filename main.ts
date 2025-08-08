@@ -1,10 +1,6 @@
 // @deno-types="npm:@types/express@4"
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import cors, { CorsOptions } from "cors";
-import { DataLayerEventType } from "./types/types.ts";
-import { AcceptedEventTypes } from "./src/types/eventTypes.ts";
-import { offerOpenSchema, pageViewSchema } from "./src/validators/EventSchemas.ts";
-import { failedEvents } from "./src/services/failedEventService.ts";
 import { validationMiddleWare } from "./src/middleware/validation.ts";
 import { eventController } from "./src/controllers/eventController.ts";
 
