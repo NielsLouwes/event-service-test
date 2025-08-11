@@ -33,19 +33,19 @@ app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
 });
 
-app.post("/events", (_req, res) => {
-  validationMiddleWare(_req.body, res);
-  const events = eventController(_req.body)
+app.post("/events", validationMiddleWare,  (req, res) => {
+  const result = eventController(req.body)
+  if (!result) return res.status(500).json({ error: 'Processing failed' });
+  const { successfulEventCount,failedEventCount, totalEvents } = result;
   
-   // below we handle status codes based on partial success, failure, and success
    let statusCode = 200;
    let message = "OK";
 
-   if (!events) return null
-   if (events.failedEventCount === events.totalEvents) {
+  
+   if (failedEventCount === totalEvents) {
     statusCode = 400
     message = "All events failed validation"
-   } else if (events.failedEventCount > 0) {
+   } else if (failedEventCount > 0) {
     statusCode = 207
     message = "Partial success, some events failed"
    }
@@ -53,12 +53,12 @@ app.post("/events", (_req, res) => {
   res.status(statusCode).json({
     message: message,
     summary: {
-    total: events.totalEvents,
-    successful: events.successfulEventCount,
-    failed: events.failedEventCount
+    total: totalEvents,
+    successful: successfulEventCount,
+    failed: failedEventCount
     }
   })
-   console.log("events", events);
+   console.log("result", result);
 });
 
 app.listen(port, () => {

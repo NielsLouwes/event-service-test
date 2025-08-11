@@ -1,16 +1,16 @@
-export const validationMiddleWare = (requestBody, response) => {
-    if (!Array.isArray(requestBody)){
-      return response.status(400).json({
+export const validationMiddleWare = (req, res , next) => {
+    if (!Array.isArray(req.body)){
+      return res.status(400).json({
         error: 'Request body must be an array of events.'
       })
     }
 
-    if (requestBody.length === 0){
-      return response.status(400).json({
+    if (req.body.length === 0){
+      return res.status(400).json({
         error: 'Request body cannot be empty'
       })
     }
 
-    return response.status(200)
+   return next();
 }
 

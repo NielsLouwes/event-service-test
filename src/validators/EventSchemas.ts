@@ -3,7 +3,7 @@ import * as z from "zod/v4";
 export const offerOpenSchema = z.object({
     eventType: z.literal('offer_open'),
     timeStamp: z.number(),
-    productId: z.number(),
+    id: z.number(),
     title: z.string(),
     category: z.string(),
     price: z.number(),

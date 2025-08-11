@@ -9,15 +9,15 @@ export const eventController = (requestBody) => {
     const events: DataLayerEventType[] = [];
     let successfulEventCount = 0;
     let failedEventCount = 0;
-    let totalEvents = requestBody.length
+    let totalEvents: number = requestBody.length
 
         try {
-            requestBody.map((event: AcceptedEventTypes) => {
+            requestBody.forEach((event: AcceptedEventTypes) => {
             console.log('event***', event)
             
             if (event.eventType === 'offer_open') {
             const result = offerOpenSchema.safeParse(event);
-            
+
             if (result.success){
                 events.push(result.data);
                 successfulEventCount++
@@ -48,7 +48,7 @@ export const eventController = (requestBody) => {
             }
         });
 
-        return {successfulEventCount, failedEventCount, totalEvents}
+        return { successfulEventCount, failedEventCount, totalEvents }
 
        
     } catch (error) {
