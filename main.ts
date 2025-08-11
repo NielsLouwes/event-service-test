@@ -1,5 +1,5 @@
 // @deno-types="npm:@types/express@4"
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors, { CorsOptions } from "cors";
 import { validationMiddleWare } from "./src/middleware/validation.ts";
 import { eventController } from "./src/controllers/eventController.ts";
@@ -12,7 +12,7 @@ const allowedOrigins = ["http://localhost:3000"];
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser tools
+    if (!origin) return callback(null, true); 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -24,13 +24,10 @@ const corsOptions: CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Handle preflight requests
 app.options("*", cors(corsOptions));
 app.use(express.json());
 
-
-// Next: implement POSTGRES for database
-
+// DB ?
 
 app.get("/", (_req, res) => {
   res.status(200).send("Welcome to the event backend service!");
@@ -38,7 +35,30 @@ app.get("/", (_req, res) => {
 
 app.post("/events", (_req, res) => {
   validationMiddleWare(_req.body, res);
-  eventController(_req.body, res)
+  const events = eventController(_req.body)
+  
+   // below we handle status codes based on partial success, failure, and success
+   let statusCode = 200;
+   let message = "OK";
+
+   if (!events) return null
+   if (events.failedEventCount === events.totalEvents) {
+    statusCode = 400
+    message = "All events failed validation"
+   } else if (events.failedEventCount > 0) {
+    statusCode = 207
+    message = "Partial success, some events failed"
+   }
+   
+  res.status(statusCode).json({
+    message: message,
+    summary: {
+    total: events.totalEvents,
+    successful: events.successfulEventCount,
+    failed: events.failedEventCount
+    }
+  })
+   console.log("events", events);
 });
 
 app.listen(port, () => {

@@ -13,6 +13,5 @@ export const offerOpenSchema = z.object({
     eventId: z.string(),
     eventType: z.literal('page_view'),
     timeStamp: z.number(),
-    location: z.string(),
-   
+    location: z.string(),  
   })
